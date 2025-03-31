@@ -162,10 +162,10 @@ External
 - **If the science plan fails any test case:** The system provides an error message with details.  
 
 ### Activity Diagram
-![](test_usecaserevise_sequence.png)  
+![](Test_revise_activity.png)  
 
 ### Sequence Diagram
-![](test_usecaserevise_sequence.png)  
+![](test_usecase_revise_sequence.png)  
 
 ### Class Diagram
 ![](class_diagram_revise.png)  
