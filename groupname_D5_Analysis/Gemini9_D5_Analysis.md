@@ -53,7 +53,7 @@ External
 ![](create_revise_activity.png)  
 
 ### Sequence Diagram
-![](Login_sequence_diagram.jpg)  
+![](create_usecase_revise_sequence.png)  
 
 ---
 
@@ -162,10 +162,10 @@ External
 - **If the science plan fails any test case:** The system provides an error message with details.  
 
 ### Activity Diagram
-![](Test_revise_activity.png)  
+![](test_usecaserevise_sequence.png)  
 
 ### Sequence Diagram
-![](Login_sequence_diagram.jpg)  
+![](test_usecaserevise_sequence.png)  
 
 ### Class Diagram
 ![](class_diagram_revise.png)  
