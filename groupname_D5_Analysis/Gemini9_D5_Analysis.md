@@ -96,6 +96,8 @@ External
 - **Step 3:** The astronomer can only submit a science plan with the status "TESTED". If the science plan is created but not tested, the system instructs the astronomer to test it first.  
 
 ### Science Plan Statuses
+Note:
+The science plan can have one of the following statuses:
 - **CREATED:** The plan is created but not tested or submitted.  
 - **TESTED:** The plan has completed testing.  
 - **SUBMITTED:** The plan has been submitted to the Observatory Control System (OCS) and is awaiting validation.  
