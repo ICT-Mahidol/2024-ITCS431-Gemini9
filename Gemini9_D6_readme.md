@@ -31,7 +31,7 @@ This is a Spring Boot web application for managing Science Plans for the Gemini 
     * Open the project in IntelliJ IDEA.
     * Locate the `Gemini9Application.java` file (or your main Application class).
     * Right-click the file and select "Run 'Gemini9Application.main()'".
-3.  **Run using Gradle (if applicable):**
+3.  **Run using Gradle (we use this):**
     * Open a Terminal or Command Prompt in the project's root directory.
     * Run the command: `./gradlew bootRun` (for Linux/macOS) or `gradlew.bat bootRun` (for Windows).
 4.  **Run using Maven (if applicable):**
