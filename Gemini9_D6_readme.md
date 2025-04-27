@@ -23,8 +23,8 @@ This is a Spring Boot web application for managing Science Plans for the Gemini 
 
 1.  **Clone Repository:**
     ```bash
-    git clone <https://github.com/owen1199/Gemini__9_D6>
-    cd <Gemini_D6_/Gemini_D6/D6/Gemini9>
+    git clone <(https://github.com/ICT-Mahidol/2024-ITCS431-Gemini9.git)>
+    cd <Gemini9_D6/Gemini_D6/D6/Gemini9>
 
     ```
 2.  **Run using IDE (e.g., IntelliJ IDEA):**
