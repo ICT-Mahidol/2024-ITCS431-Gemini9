@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>View Science Plans</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; table-layout: auto; font-size: 0.9em; }
+    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; word-wrap: break-word; }
+    th { background-color: #f2f2f2; white-space: nowrap; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+    .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .test-result-message { padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #e2e3e5; border: 1px solid #d6d8db; white-space: pre-wrap; font-family: monospace; font-size: 0.9em; max-height: 200px; overflow-y: auto; }
+    .debug-info { background-color: #fff8dc; border: 1px dashed #ccc; padding: 5px; margin-bottom: 15px; font-size: 0.8em; font-family: monospace; }
+    .workflow-note { padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #f0f0f0; border: 1px solid #e0e0e0; font-size: 0.9em; color: #444; }
+    .no-plans-message { margin-top: 15px; }
+    .back-link { margin-top: 20px; display: inline-block; }
+    .action-button { margin-right: 5px; margin-bottom: 3px; padding: 4px 8px; font-size: 0.9em; cursor: pointer; border-radius: 3px; border: 1px solid #ccc; background-color: #e7e7e7; }
+    .action-button:hover { background-color: #ddd; }
+    .edit-link { background-color: #007bff; color: white; border-color: #007bff; padding: 4px 8px; font-size: 0.9em; cursor: pointer; border-radius: 3px; border: 1px solid #007bff; text-decoration: none; display: inline-block; margin-right: 5px; margin-bottom: 3px; }
+    .edit-link:hover { background-color: #0056b3; }
+    .submit-button { background-color: #28a745; color: white; border-color: #28a745;}
+    .submit-button:hover { background-color: #218838; }
+    .test-button { background-color: #ffc107; color: black; border-color: #ffc107;}
+    .test-button:hover { background-color: #e0a800; }
+    .delete-button { background-color: #dc3545; color: white; border-color: #dc3545;}
+    .delete-button:hover { background-color: #c82333; }
+    td.objective { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .status-created { color: blue; }
+    .status-tested { color: green; font-weight: bold; }
+    .status-submitted { color: orange; }
+    .status-validated { color: darkgreen; font-weight: bold;}
+    .status-invalidated { color: red; font-style: italic;}
+    .status-running { color: purple; }
+    .status-complete { color: gray; }
+    .status-cancelled { color: darkred; }
+    .locked-info { font-size: 0.8em; color: gray; font-style: italic; }
+  </style>
+</head>
+<body>
+<h2>All Science Plans (Local Database)</h2>
+
+<div class="debug-info" sec:authorize="isAuthenticated()">
+  <strong>Debug Info:</strong> User: <span sec:authentication="name"></span> | Authorities:
+  <span th:each="authority : ${#authentication.getAuthorities()}" th:text="${authority.getAuthority()} + ' '"></span>
+</div>
+
+<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+<div th:if="${warningMessage}" class="alert alert-warning" th:text="${warningMessage}"></div>
+<div th:if="${submitSuccess}" class="alert alert-success" th:text="${submitSuccess}"></div>
+<div th:if="${submitError}" class="alert alert-danger" th:text="${submitError}"></div>
+<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+<div th:if="${testResultMessage}" class="test-result-message">
+  <strong th:if="${testResultMessage.contains('testing failed') or testResultMessage.contains('error occurred')}">Test Result (Error):</strong>
+  <strong th:unless="${testResultMessage.contains('testing failed') or testResultMessage.contains('error occurred')}">Test Result (Success):</strong>
+  <pre style="margin: 0; padding: 0; white-space: pre-wrap; font-family: inherit;"><code th:text="${testResultMessage}"></code></pre>
+</div>
+
+<div class="workflow-note">
+  <strong>Workflow Info:</strong> Astronomers create, test, and submit plans. Submitted plans await validation by Science Observers (validation function not implemented). Admins and Astronomers can manage plans (Edit/Delete) only before submission (Status: CREATED or TESTED). The 'Test' button performs OCS validation checks; a visual simulation/preview is not available in this version.
+</div>
+
+
+<div th:if="${sciencePlans != null and not #lists.isEmpty(sciencePlans)}">
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th><th>Name</th><th>Creator</th><th>Funding</th><th>Objective</th><th>Start Date</th><th>End Date</th>
+      <th>Telescope</th><th>Star System</th><th>Status</th><th>File Type</th><th>Quality</th><th>Color Type</th>
+      <th>Contrast</th><th>Brightness</th><th>Saturation</th><th>Highlights</th><th>Exposure</th><th>Shadows</th>
+      <th>Whites</th><th>Blacks</th><th>Luminance</th><th>Hue</th><th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="plan : ${sciencePlans}">
+      <td th:text="${plan.planId}"></td><td th:text="${plan.planName}"></td><td th:text="${plan.creator?.username}"></td>
+      <td th:text="${#numbers.formatDecimal(plan.funding, 1, 'COMMA', 2, 'POINT')}"></td>
+      <td class="objective" th:text="${plan.objective}" th:title="${plan.objective}"></td>
+      <td th:text="${#temporals.format(plan.startDate, 'yyyy-MM-dd HH:mm')}"></td>
+      <td th:text="${#temporals.format(plan.endDate, 'yyyy-MM-dd HH:mm')}"></td>
+      <td th:text="${plan.telescopeLocation}"></td><td th:text="${plan.targetStarSystem}"></td>
+      <td><span th:text="${plan.status}" th:classappend="'status-' + ${plan.status.name().toLowerCase()}"></span></td>
+      <td th:text="${plan.dataProcessingRequirements?.fileType}"></td><td th:text="${plan.dataProcessingRequirements?.fileQuality}"></td>
+      <td th:text="${plan.dataProcessingRequirements?.colorType}"></td><td th:text="${plan.dataProcessingRequirements?.contrast}"></td>
+      <td th:text="${plan.dataProcessingRequirements?.brightness}"></td><td th:text="${plan.dataProcessingRequirements?.saturation}"></td>
+      <td th:text="${plan.dataProcessingRequirements?.highlights}"></td><td th:text="${plan.dataProcessingRequirements?.exposure}"></td>
+      <td th:text="${plan.dataProcessingRequirements?.shadows}"></td><td th:text="${plan.dataProcessingRequirements?.whites}"></td>
+      <td th:text="${plan.dataProcessingRequirements?.blacks}"></td><td th:text="${plan.dataProcessingRequirements?.luminance}"></td>
+      <td th:text="${plan.dataProcessingRequirements?.hue}"></td>
+
+      <td style="white-space: nowrap;">
+        <th:block sec:authorize="hasAnyRole('ADMIN', 'ASTRONOMER')">
+          <a th:if="${plan.status == T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).CREATED or plan.status == T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).TESTED}"
+             th:href="@{/science-plans/edit/{planId}(planId=${plan.planId})}"
+             class="edit-link">Edit</a>
+        </th:block>
+
+        <th:block sec:authorize="hasRole('ASTRONOMER')">
+          <form th:if="${plan.status == T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).CREATED}"
+                th:action="@{/science-plans/test/{planId}(planId=${plan.planId})}"
+                method="post" style="display: inline;">
+            <button type="submit" class="action-button test-button confirm-test-button"
+                    th:data-plan-name="${plan.planName}">
+              Test
+            </button>
+          </form>
+        </th:block>
+
+        <th:block sec:authorize="hasRole('ASTRONOMER')">
+          <form th:if="${plan.status == T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).TESTED}"
+                th:action="@{/science-plans/submit/{planId}(planId=${plan.planId})}"
+                method="post" style="display: inline;">
+            <button type="submit" class="action-button submit-button confirm-submit-button"
+                    th:data-plan-name="${plan.planName}">
+              Submit
+            </button>
+          </form>
+        </th:block>
+
+        <th:block sec:authorize="hasAnyRole('ASTRONOMER')">
+          <form th:if="${plan.status == T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).CREATED or plan.status == T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).TESTED}"
+                th:action="@{/science-plans/delete/{planId}(planId=${plan.planId})}"
+                method="post" style="display: inline;">
+            <button type="submit" class="action-button delete-button confirm-delete-button"
+                    th:data-plan-name="${plan.planName}">
+              Delete
+            </button>
+          </form>
+        </th:block>
+        <th:block sec:authorize="hasRole('ADMIN')">
+          <form th:action="@{/science-plans/delete/{planId}(planId=${plan.planId})}"
+                method="post" style="display: inline;">
+            <button type="submit" class="action-button delete-button confirm-delete-button"
+                    th:data-plan-name="${plan.planName}">
+              Delete
+            </button>
+          </form>
+        </th:block>
+
+        <span class="locked-info"
+              th:if="${plan.status != T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).CREATED and plan.status != T(th.ac.mahidol.ict.Gemini_d6.model.SciencePlanStatus).TESTED}"
+              sec:authorize="hasRole('ASTRONOMER')">(Locked: Status)</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div th:if="${(sciencePlans == null or #lists.isEmpty(sciencePlans)) and errorMessage == null}" class="no-plans-message">
+  <p>No science plans found in the application database.</p>
+</div>
+<br/>
+<a th:href="@{/welcome}" class="back-link" style="text-decoration: none; color: #007bff;">Back to Welcome Page</a>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle confirmation clicks
+    const addConfirmation = function(selector, messagePrefix, messageSuffix) {
+      const buttons = document.querySelectorAll(selector);
+      buttons.forEach(button => {
+        button.addEventListener('click', function(event) {
+          const planName = event.target.dataset.planName || 'this plan'; // Get name from data attribute or use default
+          const message = messagePrefix + "'" + planName + "'" + messageSuffix;
+          if (!confirm(message)) {
+            event.preventDefault(); // Prevent form submission if user clicks Cancel
+          }
+        });
+      });
+    };
+
+    // Apply confirmation to Test buttons
+    addConfirmation('.confirm-test-button', 'Run a test simulation to verify plan accuracy(', ')?');
+
+    // Apply confirmation to Submit buttons
+    addConfirmation('.confirm-submit-button', 'Submit plan to validate', '?');
+
+    // Apply confirmation to Delete buttons
+    addConfirmation('.confirm-delete-button', 'DELETE plan ', '? This cannot be undone!');
+
+  });
+</script>
+</body>
+</html>
