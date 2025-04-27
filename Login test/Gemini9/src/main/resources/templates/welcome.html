@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Align items vertically */
+            min-height: 90vh;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .welcome-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 20px; /* Space between container and logout */
+        }
+        h1 {
+            color: #0056b3; /* A nice blue */
+            margin-bottom: 15px;
+        }
+        p {
+            color: #555;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            text-align: left; /* Align info text left */
+        }
+        .user-info strong {
+            color: #495057;
+        }
+        .logout-form {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #dc3545; /* Red for logout */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="welcome-container">
+    <h1>Welcome to the Gemini System!</h1>
+
+    <div sec:authorize="isAuthenticated()">
+        <p>You have successfully logged in.</p>
+
+        <div class="user-info">
+            <p><strong>Username:</strong> <span sec:authentication="name">Username</span></p>
+            <p><strong>Role(s):</strong>
+                <span th:each="authority : ${#authentication.getAuthorities()}"
+                      th:text="${authority.getAuthority().replaceFirst('ROLE_', '')} + ' '"
+                      style="margin-right: 5px;">Role</span>
+            </p>
+        </div>
+    </div>
+
+    <div sec:authorize="!isAuthenticated()">
+        <p>Please <a th:href="@{/login}">log in</a>.</p>
+    </div>
+</div>
+
+<form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" class="logout-form">
+    <button type="submit">Logout</button>
+</form>
+
+</body>
+</html>
